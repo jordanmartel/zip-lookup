@@ -2,6 +2,7 @@ import './App.css';
 
 import { useQuery, gql } from '@apollo/client';
 import { useState } from 'react';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 
 const GET_POSTCODE = gql`
   query Postcode($postCode: String!, $countryCode: String!) {
@@ -32,22 +33,23 @@ function Page() {
     const [form, setForm] = useState({ postalCode: "", countryCode: ""})
 
     return (
-      <div>
-        <div>
-          <h1>Select country and enter postal / zip code </h1>
-          <select value={countryCode} onChange={e => setCountryCode(e.target.value)}>
-          <option value="us">United States</option>
-            <option value="ca">Canada</option>
-          </select>
-          <br/>
-          <br/>
-          <input value={postalCode} onChange={e => setPostalCode(e.target.value)}/>
-          <br/>
-          <br/>
-          <button onClick={e => setForm({ postalCode, countryCode })}>Submit</button>
-        </div>
-        <PostCodeLocation postCode={form.postalCode} countryCode={form.countryCode} />
-      </div>
+          <Grid
+            container
+            direction="column"
+            justifyContent="center"
+            alignItems="center"> 
+            <Typography variant="h4" >Select country and enter postal / zip code </Typography>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel id="country-label">Country</InputLabel>
+              <Select labelId="country-label" value={countryCode} label="Country" onChange={e => setCountryCode(e.target.value)}>
+                <MenuItem value="us">United States</MenuItem>
+                <MenuItem value="ca">Canada</MenuItem>
+              </Select>
+              <TextField variant="outlined" value={postalCode} onChange={e => setPostalCode(e.target.value)}/>
+              <Button variant="contained" onClick={() => setForm({ postalCode, countryCode })}>Submit</Button>
+            </FormControl>
+            <PostCodeLocation postCode={form.postalCode} countryCode={form.countryCode} />
+          </Grid>
     )
 }
 
