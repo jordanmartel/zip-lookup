@@ -3,7 +3,7 @@ import './App.css';
 import { useState } from 'react';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { countryCodes } from './helpers/contants';
-import { Place } from './place/Place';
+import { PostCodeDisplay } from './postcode/PostCodeDisplay';
 
 function Page() {
 
@@ -45,7 +45,7 @@ function Page() {
         </FormControl>
       </Grid>
       <Grid item>
-        <Place postCode={form.postalCode} countryCode={form.countryCode} />
+        <PostCodeDisplay postCode={form.postalCode} countryCode={form.countryCode} />
       </Grid>
     </Grid>
   )
