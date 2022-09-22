@@ -1,8 +1,7 @@
 
-import axios from 'axios';
+import axios, { AxiosError, AxiosStatic } from 'axios';
 import { Place, PostCode } from './postcode';
 
-const ZIPPO_URI = 'http://api.zippopotam.us/'
 
 interface ZippoPlace { 
     "place name": string,
@@ -19,34 +18,52 @@ interface ZippoPostCode {
     places: ZippoPlace[]
 }
 
-const zippoPostCodeToPostCode = (zippoPostCode: ZippoPostCode): PostCode => {
-    return {
-        postCode: zippoPostCode['post code'],
-        country: zippoPostCode.country,
-        countryAbbrev: zippoPostCode['country abbreviation'],
-        places: zippoPostCode.places.map((zippoPlace) => zippoPlaceToPlace(zippoPlace))
-    }
-}
 
-const zippoPlaceToPlace = (zippoPlace: ZippoPlace): Place => {
-    return {
-        name: zippoPlace['place name'],
-        state: zippoPlace.state,
-        stateAbbrev: zippoPlace['state abbreviation'],
-        longitude: zippoPlace.longitude,
-        latitude: zippoPlace.latitude
-    }
-}
+export class ZippoClient {
 
-export const getPostCode = async (postCode: string, countryCode: string) => {
-    try {
-        const resp = await axios.get(`${ZIPPO_URI}/${countryCode}/${postCode}`)
-        if (!resp || !(resp.status === 200)) {
-            throw new Error('Unable to find postcode');
+    private uri;
+    private client = axios;
+
+    constructor(uri: string, client?: AxiosStatic) {
+        this.uri = uri
+        
+        // override default if provided for testing
+        if (client) { 
+            this.client = client
         }
-        return zippoPostCodeToPostCode(resp.data as ZippoPostCode)
-    } catch (error) {
-        // TODO: Provide better clarity on the error
-        throw new Error('Unable to find postcode');    
+    }
+
+    zippoPostCodeToPostCode = (zippoPostCode: ZippoPostCode): PostCode => {
+        
+        const places = zippoPostCode.places ? zippoPostCode.places.map((zippoPlace) => this.zippoPlaceToPlace(zippoPlace)) : [];
+        return {
+            postCode: zippoPostCode['post code'] ?  zippoPostCode['post code'] : '' ,
+            country: zippoPostCode.country ? zippoPostCode.country : '',
+            countryAbbrev: zippoPostCode['country abbreviation'] ? zippoPostCode['country abbreviation'] : '',
+            places
+        }
+    }
+    
+    zippoPlaceToPlace = (zippoPlace: ZippoPlace): Place => {
+        return {
+            name: zippoPlace['place name'] ? zippoPlace['place name'] : '',
+            state: zippoPlace.state ? zippoPlace.state : '',
+            stateAbbrev: zippoPlace['state abbreviation'] ? zippoPlace['state abbreviation'] : '',
+            longitude: zippoPlace.longitude ? zippoPlace.longitude : '',
+            latitude: zippoPlace.latitude ? zippoPlace.latitude : ''
+        }
+    }
+    
+    getPostCode = async (postCode: string, countryCode: string) => {
+        try {
+            const resp = await this.client.get(`${this.uri}/${countryCode}/${postCode}`)
+            return this.zippoPostCodeToPostCode(resp.data as ZippoPostCode)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                throw new Error(`API request failed with error code ${error.code}. The reason was: ${error.message}`);    
+            }
+            throw error;
+        }
+
     }
 }
