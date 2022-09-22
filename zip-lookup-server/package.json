@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "API to lookup a zip code using zippopotam",
   "main": "index.ts",
+  "engines": {
+    "npm": ">=8.15.0",
+    "node": ">=16.17.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",

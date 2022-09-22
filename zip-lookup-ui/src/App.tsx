@@ -1,95 +1,60 @@
 import './App.css';
 
-import { useQuery, gql } from '@apollo/client';
 import { useState } from 'react';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
-
-const GET_POSTCODE = gql`
-  query Postcode($postCode: String!, $countryCode: String!) {
-    postcode(postCode: $postCode, countryCode: $countryCode) {
-      postCode
-      country
-      countryAbbrev
-      places {
-        name
-        state
-      }
-    }
-  }
-`;
-
-interface Place {
-  name: string,
-  longitude: string,
-  state: string,
-  stateAbbrev: string,
-  latitude: string
-}
+import { countryCodes } from './helpers/contants';
+import { Place } from './place/Place';
 
 function Page() {
 
-    const [postalCode, setPostalCode] = useState("");
-    const [countryCode, setCountryCode] = useState("");
-    const [form, setForm] = useState({ postalCode: "", countryCode: ""})
+  const [postalCode, setPostalCode] = useState("");
+  const [countryCode, setCountryCode] = useState("us");
+  const [form, setForm] = useState({ postalCode: "", countryCode: "" })
 
-    return (
-          <Grid
-            container
-            direction="column"
-            justifyContent="center"
-            alignItems="center"> 
-            <Typography variant="h4" >Select country and enter postal / zip code </Typography>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <InputLabel id="country-label">Country</InputLabel>
-              <Select labelId="country-label" value={countryCode} label="Country" onChange={e => setCountryCode(e.target.value)}>
-                <MenuItem value="us">United States</MenuItem>
-                <MenuItem value="ca">Canada</MenuItem>
-              </Select>
-              <TextField variant="outlined" value={postalCode} onChange={e => setPostalCode(e.target.value)}/>
-              <Button variant="contained" onClick={() => setForm({ postalCode, countryCode })}>Submit</Button>
-            </FormControl>
-            <PostCodeLocation postCode={form.postalCode} countryCode={form.countryCode} />
-          </Grid>
-    )
-}
-
-interface PostCodeLocationProperties{
-  postCode: string
-  countryCode: string
-}
-
-function PostCodeLocation({postCode, countryCode}: PostCodeLocationProperties) { 
-
-
-  const { loading, error, data } = useQuery(GET_POSTCODE, { variables: { postCode, countryCode }, skip: !postCode || !countryCode}, );
-
-  if (!postCode || !countryCode) {
-    return (
-      <div></div>
-    )
-  }
-  
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Invalid postal code</p>;
-
-  return data.postcode.places.map((place: Place) => (
-    <div key={place.name}>
-      <b>City</b>
-      <p>{place.name}</p>
-      <br />
-      <b>State</b>
-      <p>{place.state}</p>
-      <br />
-    </div>
-
+  const countries = countryCodes.map(country => (
+    <MenuItem key={country[0]} value={country[0]}>{country[1]}</MenuItem>
   ))
 
+  return (
+    <Grid
+      marginTop={1}
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={4}>
+      <Grid item>
+        <Typography variant="h5" >Postal / Zip code lookup </Typography>
+      </Grid>
+      <Grid item>
+        <FormControl>
+          <Grid container direction="column" spacing={3} >
+            <Grid item>
+              <InputLabel id="country-label">Country</InputLabel>
+              <Select fullWidth labelId="country-label" value={countryCode} label="Country" onChange={e => setCountryCode(e.target.value)}>
+                {countries}
+              </Select>
+            </Grid>
+            <Grid item>
+              <TextField variant="outlined" placeholder="Postal / Zip Code" value={postalCode} onChange={e => setPostalCode(e.target.value)} />
+            </Grid>
+            <Grid item alignSelf="center">
+              <Button variant="contained" onClick={() => setForm({ postalCode, countryCode })}>Submit</Button>
+            </Grid>
+          </Grid>
+        </FormControl>
+      </Grid>
+      <Grid item>
+        <Place postCode={form.postalCode} countryCode={form.countryCode} />
+      </Grid>
+    </Grid>
+  )
 }
 
 export default function App() {
   return (
     <div>
-    <Page />
+      <Page />
     </div>
   )
 }
