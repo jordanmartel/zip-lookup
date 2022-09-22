@@ -2,8 +2,8 @@
 
 This project provides a simple zip / postal code lookup tool. The tool accepts a country and postal / zip code and displays the city and state / province that the code refers to
 
-The server use NodeJS with Apollo Server (GraphQL), and uses https://www.zippopotam.us/ as a data source
-The UI use a Create React App with simple Material UI
+* The server use NodeJS with Apollo Server (GraphQL), and uses https://www.zippopotam.us/ as a data source
+* The UI use a Create React App with simple Material UI
 
 # Usage
 Both server and ui should be running at the same time
@@ -21,9 +21,11 @@ Note: This version does not have any validation in the postal / zip code input. 
 
 Example usage: 
 
-* Select "Canada"
-* Enter the first 3 characters of a Canadian postal code (ex: L7C, M5E)
+1) 
+    * Select "Canada"
+    * Enter the first 3 characters of a Canadian postal code (ex: L7C, M5E)
 
-* Select "United States"
-* Enter 5 digit zip code (ex: 90210, 04401)
+2)
+    * Select "United States"
+    * Enter 5 digit zip code (ex: 90210, 04401)
 
